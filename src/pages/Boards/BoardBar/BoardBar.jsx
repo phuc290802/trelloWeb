@@ -6,6 +6,7 @@ import AddToDriveIcon from '@mui/icons-material/AddToDrive'
 import BoltIcon from '@mui/icons-material/Bolt'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import { capitalizeFirstLetter } from '~/utils/formatters'
 const MENU_STYLES = {
   color: 'white',
   bgcolor: 'transparent',
@@ -17,7 +18,7 @@ const MENU_STYLES = {
   }
 }
 
-function BoardBar() {
+function BoardBar({ board }) {
   return (
     <Box
       sx={(theme) => ({
@@ -29,8 +30,7 @@ function BoardBar() {
         justifyContent: 'space-between',
         gap: 2,
         overflow: 'auto',
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
-        borderBottom: '1px solid white'
+        bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2')
       })}
     >
       <Box>
@@ -39,7 +39,7 @@ function BoardBar() {
             MENU_STYLES
           }
           icon={<DashboardIcon />}
-          label="Mern stack"
+          label={ board.title }
           clickable
         />
         <Chip
@@ -47,7 +47,7 @@ function BoardBar() {
             MENU_STYLES
           }
           icon={<VpnLockIcon />}
-          label="Public/Private Workspace"
+          label= { capitalizeFirstLetter(board?.type) }
           clickable
         />
         <Chip
@@ -105,16 +105,16 @@ function BoardBar() {
           }}
         >
           <Tooltip title="Mern stack">
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+            <Avatar alt="Remy Sharp" src="https://i.pinimg.com/736x/9e/a7/b5/9ea7b548bb35114bdd527eefbe40166e.jpg" />
           </Tooltip>
           <Tooltip title="Mern stack">
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+            <Avatar alt="Remy Sharp" src="https://i.pinimg.com/736x/6a/cf/02/6acf02953d3a39fb6f595675f9a4040c.jpg" />
           </Tooltip>
           <Tooltip title="Mern stack">
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+            <Avatar alt="Remy Sharp" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvR3D7ZYuO86DXwCbuavpyW9McveEUVpio0w&s" />
           </Tooltip>
           <Tooltip title="Mern stack">
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+            <Avatar alt="Remy Sharp" src="https://yt3.googleusercontent.com/g3j3iOUOPhNxBCNAArBqiYGzHzCBIzr_Al8mdvtBJeZMGFDblnU5rlVUt6GY01AUwm7Cp70J=s900-c-k-c0x00ffffff-no-rj" />
           </Tooltip>
         </AvatarGroup>
       </Box>
