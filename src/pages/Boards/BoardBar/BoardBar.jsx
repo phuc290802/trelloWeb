@@ -84,7 +84,6 @@ function BoardBar({ board }) {
             '&:hover': {
               borderColor: 'white'
             }
-
           }}
         >
           Invite</Button>
