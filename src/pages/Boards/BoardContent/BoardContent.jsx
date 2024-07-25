@@ -23,7 +23,15 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
-function BoardContent( { board, createNewColumn, createNewCard, moveColumns, moveCardInTheSameColumn } ) {
+function BoardContent( { 
+  board,
+  createNewColumn,
+  createNewCard,
+  moveColumns,
+  moveCardInTheSameColumn,
+  moveCardToDifferentColumn,
+  deleteColumnDetails
+} ) {
   // const pointerSensor = useSensor( PointerSensor, { activationConstraint: { distance: 10 } })
   // Ask the mouse to move 10 pixels to call event
   const mouseSensor = useSensor( MouseSensor, { activationConstraint: { distance: 10 } })
@@ -55,7 +63,8 @@ function BoardContent( { board, createNewColumn, createNewCard, moveColumns, mov
     activeDraggingCardId,
     overCardId,
     active,
-    over
+    over,
+    triggerFrom
   ) => {
     setOrderCloumn(prevColumns => {
       //Finding overcard location
@@ -95,6 +104,10 @@ function BoardContent( { board, createNewColumn, createNewCard, moveColumns, mov
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
       }
 
+      if (triggerFrom === 'handleDragEnd') {
+        moveCardToDifferentColumn(activeDragItemId, oldColumnWhenDragging._id, nextOverColumn._id, nextColumns)
+      }
+
       return nextColumns
     })
   }
@@ -110,7 +123,6 @@ function BoardContent( { board, createNewColumn, createNewCard, moveColumns, mov
   }
   // Trigger while drag one item
   const handleDragOver = ( event ) => {
-    console.log(event)
     // if drag column ,dont need do anything
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) return
     // Check active and over
@@ -136,7 +148,8 @@ function BoardContent( { board, createNewColumn, createNewCard, moveColumns, mov
         activeDraggingCardId,
         overCardId,
         active,
-        over
+        over,
+        'handleDragOver'
       )
     }
   }
@@ -167,7 +180,8 @@ function BoardContent( { board, createNewColumn, createNewCard, moveColumns, mov
           activeDraggingCardId,
           overCardId,
           active,
-          over
+          over,
+          'handleDragEnd'
         )
       }
       else {
@@ -248,6 +262,7 @@ function BoardContent( { board, createNewColumn, createNewCard, moveColumns, mov
           columns={orderedCloumns}
           createNewColumn={createNewColumn}
           createNewCard={createNewCard}
+          deleteColumnDetails={deleteColumnDetails}
         />
         <DragOverlay dropAnimation={customDropAnimation}>
           { !activeDragItemType && null }
