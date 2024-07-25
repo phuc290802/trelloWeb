@@ -9,10 +9,14 @@ import {
   createNewColumnAPI,
   createNewCardAPI,
   updateBoardDetailsAPI,
-  updateColumnDetailsAPI
+  updateColumnDetailsAPI,
+  moveCardToDifferentColumnAPI,
+  deleteColumnDetailsAPI
 } from '~/apis'
 import { generatePlaceholderCard } from '~/utils/formatters'
 import { isEmpty } from 'lodash'
+import { toast } from 'react-toastify'
+
 import { Box, CircularProgress } from '@mui/material'
 // import { mockData } from '~/apis/mock-data'
 
@@ -88,8 +92,14 @@ function Board() {
     const newBoard ={ ...board }
     const columnToUpdate = newBoard.columns.find(column => column._id === createdCard.columnId)
     if (columnToUpdate) {
-      columnToUpdate.cards.push(createdCard)
-      columnToUpdate.cardOrderIds.push(createdCard._id)
+      if (columnToUpdate.cards.some(card => card.FE_PlaceholderCard)) {
+        columnToUpdate.cards = [createdCard]
+        columnToUpdate.cardOrderIds = [createdCard._id]
+      }
+      else {
+        columnToUpdate.cards.push(createdCard)
+        columnToUpdate.cardOrderIds.push(createdCard._id)
+      }
     }
     setBoard(newBoard)
   }
@@ -113,8 +123,37 @@ function Board() {
       columnToUpdate.cardOrderIds = dndOrderedCardIds
     }
     setBoard(newBoard)
-    // updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds })
+    updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds })
 
+  }
+  const moveCardToDifferentColumn = (currentCardId, prevColumnId, nextColumnId, dndOrderedColumns) => {
+    const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id)
+    const newBoard = { ...board }
+    newBoard.columns = dndOrderedColumns
+    newBoard.columnOrderIds = dndOrderedColumnsIds
+    setBoard(newBoard)
+    let prevCardOrderIds = dndOrderedColumns.find(c => c._id === prevColumnId)?.cardOrderIds
+    //Fix bug when fragg the prevCardOrderIds have string (placeholder-card)
+    if (prevCardOrderIds[0].includes('placeholder-card')) {
+      prevCardOrderIds = []
+    }
+    moveCardToDifferentColumnAPI({
+      currentCardId,
+      prevColumnId,
+      prevCardOrderIds,
+      nextColumnId,
+      nextCardOrderIds: dndOrderedColumns.find(c => c._id === nextColumnId)?.cardOrderIds
+    } )
+    //Call api To update card when drag done
+  }
+  const deleteColumnDetails = (columnId) => {
+    const newBoard = { ...board }
+    newBoard.columns = newBoard.columns.filter(c => c._id !== columnId)
+    newBoard.columnOrderIds = newBoard.columnOrderIds.filter(_id => _id !== columnId)
+    setBoard(newBoard)
+    deleteColumnDetailsAPI(columnId).then(res => {
+      toast.success(res.deleteResult)
+    })
   }
   return (
     <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
@@ -128,6 +167,8 @@ function Board() {
             createNewCard={createNewCard}
             moveColumns={moveColumns}
             moveCardInTheSameColumn={moveCardInTheSameColumn}
+            moveCardToDifferentColumn={moveCardToDifferentColumn}
+            deleteColumnDetails={deleteColumnDetails}
           />
         </>
       ) : (
